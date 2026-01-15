@@ -82,6 +82,8 @@ IMessageEditorController, IProxyListener {
     private static JCheckBox enabled_springcross;
     private static JCheckBox enabled_ueditor;
     private static JCheckBox enabled_thinkphp;
+    private static JCheckBox enabled_jeecgboot;
+    private static JCheckBox enabled_react2shell;
     private static JCheckBox enabled_laravel;
     private static JCheckBox enabled_Jboss;
     private static JCheckBox enabled_xxljob;
@@ -200,6 +202,8 @@ IMessageEditorController, IProxyListener {
         enabled_sqli.setSelected(Config.getBoolean("enabled_sqli", true));
         enabled_springcross.setSelected(Config.getBoolean("enabled_springcross", true));
         enabled_thinkphp.setSelected(Config.getBoolean("enabled_thinkphp", true));
+        enabled_jeecgboot.setSelected(Config.getBoolean("enabled_jeecgboot", true));
+        enabled_react2shell.setSelected(Config.getBoolean("enabled_react2shell", true));
         enabled_laravel.setSelected(Config.getBoolean("enabled_laravel", true));
         enabled_springenv.setSelected(Config.getBoolean("enabled_springenv", true));
         enabled_Jboss.setSelected(Config.getBoolean("enabled_Jboss", true));
@@ -223,6 +227,8 @@ IMessageEditorController, IProxyListener {
         Config.setBoolean("enabled_ueditor", enabled_ueditor.isSelected());
         Config.setBoolean("enabled_springcross", enabled_springcross.isSelected());
         Config.setBoolean("enabled_thinkphp", enabled_thinkphp.isSelected());
+        Config.setBoolean("enabled_jeecgboot", enabled_jeecgboot.isSelected());
+        Config.setBoolean("enabled_react2shell", enabled_react2shell.isSelected());
         Config.setBoolean("enabled_laravel", enabled_laravel.isSelected());
         Config.setBoolean("enabled_springenv", enabled_springenv.isSelected());
         Config.setBoolean("enabled_Jboss", enabled_Jboss.isSelected());
@@ -518,6 +524,14 @@ IMessageEditorController, IProxyListener {
         enabled_thinkphp = new JCheckBox();
         subPanel_thinkPHP.add(new JLabel("Enable ThinkPHP Scan: "));
         subPanel_thinkPHP.add(enabled_thinkphp);
+        JPanel subPanel_jeecgboot = BurpExtender.GetXJPanel();
+        enabled_jeecgboot = new JCheckBox();
+        subPanel_jeecgboot.add(new JLabel("Enable JeecgBoot Scan: "));
+        subPanel_jeecgboot.add(enabled_jeecgboot);
+        JPanel subPanel_react2shell = BurpExtender.GetXJPanel();
+        enabled_react2shell = new JCheckBox();
+        subPanel_react2shell.add(new JLabel("Enable React2Shell Scan: "));
+        subPanel_react2shell.add(enabled_react2shell);
         JPanel subPanel_laravel = BurpExtender.GetXJPanel();
         enabled_laravel = new JCheckBox();
         subPanel_laravel.add(new JLabel("Enable Laravel Scan: "));
@@ -573,6 +587,8 @@ IMessageEditorController, IProxyListener {
         configMainPanel.add(subPanel_fastjson);
         configMainPanel.add(subPanel_weblogic);
         configMainPanel.add(subPanel_thinkPHP);
+        configMainPanel.add(subPanel_jeecgboot);
+        configMainPanel.add(subPanel_react2shell);
         configMainPanel.add(subPanel_laravel);
         configMainPanel.add(subPanel_ueditor);
         configMainPanel.add(subPanel_sqli);
@@ -1197,6 +1213,28 @@ IMessageEditorController, IProxyListener {
             }
             if (this.IsneedScan(baseRequestResponse, "Ueditor") && this.Istarget(baseRequestResponse) && Config.getBoolean("enabled_scan", true) && Config.getBoolean("enabled_ueditor", true) && !scannedDomainURL_Ueditor_dotnet_rce.contains((url = helpers.analyzeRequest(baseRequestResponse).getUrl()).getHost() + ":" + url.getPort()) && Config.getBoolean("enabled_scan", true) && (ueditor_dotnet_rce_reqres = UeditorScan.UeditorDotNetRCEScan(baseRequestResponse, callbacks, helpers, "")) != null && ueditor_dotnet_rce_reqres.getResponse() != null && this.IsneedAddIssuse(ueditor_dotnet_rce_reqres, "Ueditor .net RCE Found")) {
                 issues = this.Addissuse(ueditor_dotnet_rce_reqres, "Ueditor .net RCE Found", issues);
+            }
+
+            if (this.IsneedScan(baseRequestResponse, "JeecgBoot") && this.Istarget(baseRequestResponse) && Config.getBoolean("enabled_scan", true) && Config.getBoolean("enabled_jeecgboot", true)) {
+                try {
+                     IHttpRequestResponse jeecgboot_reqres = JeecgBootScan.Scan(baseRequestResponse, callbacks, helpers);
+                     if (jeecgboot_reqres != null && jeecgboot_reqres.getResponse() != null) {
+                         issues = this.Addissuse(jeecgboot_reqres, "JeecgBoot Vulnerability Found", issues);
+                     }
+                } catch (Exception e) {
+                    stdout.println("JeecgBoot Scan Error: " + e);
+                }
+            }
+
+            if (this.IsneedScan(baseRequestResponse, "React2Shell") && this.Istarget(baseRequestResponse) && Config.getBoolean("enabled_scan", true) && Config.getBoolean("enabled_react2shell", true)) {
+                try {
+                     IHttpRequestResponse react2shell_reqres = React2ShellScan.Scan(baseRequestResponse, callbacks, helpers);
+                     if (react2shell_reqres != null && react2shell_reqres.getResponse() != null) {
+                         issues = this.Addissuse(react2shell_reqres, "React2Shell Vulnerability Found", issues);
+                     }
+                } catch (Exception e) {
+                    stdout.println("React2Shell Scan Error: " + e);
+                }
             }
 
 

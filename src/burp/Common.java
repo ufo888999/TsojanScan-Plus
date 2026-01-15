@@ -41,10 +41,15 @@ public class Common {
     }
 
     public static String getResbody(byte[] res, IExtensionHelpers helpers) {
-        int bodyOffset = helpers.analyzeResponse(res).getBodyOffset();
-        String response = new String(res);
-        String body = response.substring(bodyOffset);
-        return body;
+        try {
+            int bodyOffset = helpers.analyzeRequest(res).getBodyOffset();
+            if (bodyOffset <= 0 || bodyOffset >= res.length) {
+                return "";
+            }
+            return new String(res, bodyOffset, res.length - bodyOffset);
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     public static String getRespBody(IHttpRequestResponse reqres) {
